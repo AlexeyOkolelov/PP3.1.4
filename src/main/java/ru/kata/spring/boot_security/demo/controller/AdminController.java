@@ -9,6 +9,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -26,25 +27,25 @@ public class AdminController {
 
 
     @GetMapping("")
-    public String showAllUser(ModelMap model) {
-        List<User> messages = userServise.getAllUser();
-        model.addAttribute("messages", messages);
+    public String showAllUser(ModelMap model, Principal principal) {
+        model.addAttribute("admin", userServise.findUserByName(principal.getName()));
+        model.addAttribute("people", userServise.getAllUser());
+        model.addAttribute("person", new User());
+        model.addAttribute("roles", roleServise.getAllRole());
         return "admin";
     }
 
     @GetMapping("/addNewUser")
     public String addNewUser(ModelMap model) {
 
-        model.addAttribute("messages", new User());
-
         model.addAttribute("roles", roleServise.getAllRole());
-
+        model.addAttribute("person", new User());
 
         return "userInfo";
     }
 
     @PostMapping()
-    public String addUser(@ModelAttribute("messages") User user) {
+    public String addUser(@ModelAttribute("person") User user) {
 
         userServise.addUser(user);
 
@@ -60,12 +61,12 @@ public class AdminController {
 
     @GetMapping("/user-update/{id}")
     public String updateUser(@PathVariable("id") Long id, ModelMap model) {
-        User messages = userServise.findUserById(id);
-        model.addAttribute("messages", messages);
+        model.addAttribute("person", userServise.findUserById(id));
         List<Role> roles = roleServise.getAllRole();
         model.addAttribute("roles", roles);
         return "userInfo";
     }
+
 
 
 }
